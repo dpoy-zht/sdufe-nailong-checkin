@@ -1,0 +1,1980 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#FFE4A0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="奶龙签到">
+<link rel="manifest" href="manifest.json">
+<title>奶龙图书馆签到</title>
+
+<!-- ===== 圆润卡通字体 ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Varela+Round&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   🎨 奶龙奶油卡通风主题变量
+   修改以下变量即可一键换肤
+n ============================================================ */
+:root {
+  /* 主色调 - 马卡龙奶油系 */
+  --cream-yellow: #FFE4A0;      /* 鹅黄 */
+  --cream-white: #FFFDF7;       /* 奶白 */
+  --mint-green: #B8F0D8;        /* 浅薄荷绿 */
+  --sakura-pink: #FFD1DC;       /* 樱花粉 */
+  --sky-blue: #B8E4F0;          /* 天蓝 */
+  --lavender: #E8D5F2;          /* 薰衣草 */
+  --peach: #FFD4B3;             /* 蜜桃 */
+
+  /* 功能色 */
+  --checkin-color: #A0D8EF;     /* 签到 - 淡蓝 */
+  --tempout-color: #FFD6A5;     /* 临时离馆 - 暖橙 */
+  --checkout-color: #FFB3BA;    /* 签离 - 柔粉 */
+
+  /* 文字色 */
+  --text-main: #5A4A3A;         /* 主文字 - 暖棕 */
+  --text-sub: #9A8B7A;          /* 次要文字 */
+  --text-light: #FFF;           /* 亮色文字 */
+
+  /* 背景 - 带微妙渐变的玻璃质感 */
+  --bg-page: linear-gradient(180deg, #FFF9E8 0%, #FFF0F5 40%, #E8F5F0 100%);
+  --bg-card: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.80) 0%,
+    rgba(255, 255, 255, 0.68) 50%,
+    rgba(255, 253, 250, 0.72) 100%);
+  --bg-glass: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.62) 0%,
+    rgba(255, 252, 245, 0.48) 100%);
+
+  /* 阴影 - 多层叠加系统 */
+  --shadow-contact: 0 1px 2px rgba(139, 119, 99, 0.06);       /* 接触阴影（最淡） */
+  --shadow-mid:     0 4px 12px rgba(139, 119, 99, 0.10);      /* 中部阴影 */
+  --shadow-far:     0 12px 32px rgba(139, 119, 99, 0.14);     /* 远距阴影 */
+  --shadow-elevated: 0 8px 28px rgba(139, 119, 99, 0.16);     /* 悬浮态远距 */
+  --shadow-hover:   0 16px 48px rgba(139, 119, 99, 0.20);    /* hover 远距 */
+  --shadow-inset:   inset 0 1px 0 rgba(255, 255, 255, 0.9),  /* 顶部高光 */
+                    inset 0 -1px 2px rgba(139, 119, 99, 0.04); /* 底部暗边 */
+  /* 组合：默认卡片 */
+  --shadow-card: var(--shadow-contact), var(--shadow-mid), var(--shadow-far), var(--shadow-inset);
+  /* 组合：悬浮卡片 */
+  --shadow-card-hover: 0 2px 6px rgba(139, 119, 99, 0.08),
+                        0 8px 24px rgba(139, 119, 99, 0.14),
+                        0 20px 56px rgba(139, 119, 99, 0.18),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  /* 按钮专用 */
+  --shadow-btn: 0 3px 10px rgba(255, 179, 71, 0.25),
+                 0 1px 4px rgba(255, 179, 71, 0.15);
+  --shadow-btn-hover: 0 6px 20px rgba(255, 179, 71, 0.35),
+                       0 2px 8px rgba(255, 179, 71, 0.2);
+  --shadow-btn-press: 0 1px 3px rgba(255, 179, 71, 0.2),
+                       inset 0 1px 3px rgba(139, 119, 99, 0.08);
+
+  /* 动画曲线 - 专业贝塞尔 */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);           /* 弹性回弹 */
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);              /* 平滑进出 */
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.27, 1.55);       /* 过冲弹跳 */
+
+  /* 圆角 */
+  --radius-sm: 16px;
+  --radius-md: 24px;
+  --radius-lg: 32px;
+  --radius-xl: 40px;
+
+  /* 字体 */
+  --font-cartoon: 'Nunito', 'Varela Round', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+/* ============================================================
+   基础重置
+   ============================================================ */
+* {
+  margin: 0; padding: 0; box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  font-family: var(--font-cartoon);
+  background: var(--bg-page);
+  background-attachment: fixed;
+  color: var(--text-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 时段主题 */
+body[data-period="morning"]   { --bg-page: linear-gradient(180deg, #FFF9E8 0%, #FFEEBB 40%, #FFF5E0 100%); }
+body[data-period="noon"]      { --bg-page: linear-gradient(180deg, #FFF5E0 0%, #FFE0B2 40%, #FFF3E0 100%); }
+body[data-period="afternoon"]{ --bg-page: linear-gradient(180deg, #FFF0F5 0%, #E8F5F0 40%, #F3E5F5 100%); }
+body[data-period="evening"]   { --bg-page: linear-gradient(180deg, #EDE7F6 0%, #E8EAF6 40%, #E3F2FD 100%); }
+body[data-period="night"]     { --bg-page: linear-gradient(180deg, #263238 0%, #1A237E 40%, #0D1B2A 100%); }
+body[data-period="night"]     { --text-main: #B0BEC5; --text-sub: #78909C; --bg-card: rgba(55,71,79,0.7); }
+
+/* ============================================================
+   ☁️ 漂浮云朵装饰
+   ============================================================ */
+.cloud {
+  position: fixed;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 50px;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(1px);
+}
+.cloud::before, .cloud::after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+}
+/* 云朵1 */
+.cloud-1 {
+  width: 80px; height: 30px;
+  top: 12%; left: -100px;
+  animation: floatCloud 25s linear infinite;
+}
+.cloud-1::before { width: 40px; height: 40px; top: -18px; left: 12px; }
+.cloud-1::after  { width: 35px; height: 35px; top: -12px; left: 38px; }
+/* 云朵2 */
+.cloud-2 {
+  width: 60px; height: 24px;
+  top: 28%; left: -80px;
+  animation: floatCloud 32s linear infinite;
+  animation-delay: -8s;
+}
+.cloud-2::before { width: 32px; height: 32px; top: -14px; left: 10px; }
+.cloud-2::after  { width: 28px; height: 28px; top: -10px; left: 30px; }
+/* 云朵3 */
+.cloud-3 {
+  width: 100px; height: 36px;
+  top: 55%; left: -120px;
+  animation: floatCloud 28s linear infinite;
+  animation-delay: -15s;
+}
+.cloud-3::before { width: 50px; height: 50px; top: -22px; left: 15px; }
+.cloud-3::after  { width: 42px; height: 42px; top: -16px; left: 48px; }
+@keyframes floatCloud {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(calc(100vw + 200px)); }
+}
+
+/* ============================================================
+   🐉 迷你奶龙贴纸装饰（页面边角）
+   ============================================================ */
+.sticker {
+  position: fixed;
+  pointer-events: none;
+  z-index: 5;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+}
+.sticker img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+}
+.sticker-tr {
+  top: 80px; right: 8px;
+  width: 60px; height: 60px;
+  animation: gentleBounce 3s var(--ease-smooth) infinite;
+}
+.sticker-bl {
+  bottom: 60px; left: 8px;
+  width: 70px; height: 70px;
+  animation: gentleBounce 3.5s var(--ease-smooth) infinite;
+  animation-delay: 0.5s;
+}
+.sticker-br {
+  bottom: 100px; right: 8px;
+  width: 55px; height: 55px;
+  animation: gentleBounce 2.8s var(--ease-smooth) infinite;
+  animation-delay: 1s;
+}
+@keyframes gentleBounce {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50%      { transform: translateY(-10px) rotate(5deg); }
+}
+
+/* ============================================================
+   🐉 滚动跟随浮动奶龙
+   ============================================================ */
+.scroll-nailong {
+  position: fixed;
+  bottom: 20px;
+  right: 12px;
+  width: 50px; height: 50px;
+  z-index: 80;
+  opacity: 0.7;
+  transition: transform 0.3s var(--ease-smooth), opacity 0.3s;
+  pointer-events: none;
+  animation: scrollFloat 4s var(--ease-smooth) infinite;
+}
+@keyframes scrollFloat {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50%      { transform: translateY(-8px) rotate(3deg); }
+}
+
+/* ============================================================
+   📱 手机容器（电脑端居中）
+   ============================================================ */
+.phone-frame {
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+/* ============================================================
+   🔝 顶部导航栏
+   ============================================================ */
+.top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: linear-gradient(135deg, var(--cream-yellow) 0%, var(--peach) 100%);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  padding: 16px 20px 14px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: box-shadow 0.3s var(--ease-smooth);
+}
+.top-nav:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.menu-btn {
+  width: 40px; height: 40px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.25s var(--ease-smooth);
+  box-shadow: var(--shadow-contact), var(--shadow-mid);
+}
+.menu-btn:hover {
+  background: rgba(255,255,255,0.85);
+  transform: scale(1.05) rotate(-2deg);
+}
+.menu-btn:active { transform: scale(0.92); background: rgba(255,255,255,0.95); }
+  .nav-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .nav-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    vertical-align: middle;
+  }
+.nav-time {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-sub);
+  background: rgba(255,255,255,0.5);
+  padding: 6px 12px;
+  border-radius: 12px;
+}
+
+/* ============================================================
+   📋 侧边菜单栏
+   ============================================================ */
+.side-menu {
+  position: fixed;
+  top: 0; left: 0;
+  width: 260px; height: 100vh;
+  background: linear-gradient(180deg, #FFF9E8 0%, #FFF0F5 100%);
+  z-index: 100;
+  transform: translateX(-100%);
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 8px 0 32px rgba(0,0,0,0.1);
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+  overflow: hidden;
+}
+.side-menu.open { transform: translateX(0); }
+.menu-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.2);
+  z-index: 99;
+  display: none;
+  backdrop-filter: blur(4px);
+}
+.menu-overlay.show { display: block; }
+.menu-header {
+  padding: 28px 20px 20px;
+  background: linear-gradient(135deg, var(--cream-yellow), var(--peach));
+  text-align: center;
+}
+.menu-avatar {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  border: 4px solid #FFF;
+  box-shadow: var(--shadow-mid), inset 0 -2px 4px rgba(0,0,0,0.05);
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+.menu-header h3 {
+  font-size: 18px; font-weight: 800;
+  color: var(--text-main);
+}
+.menu-header p {
+  font-size: 13px; color: var(--text-sub);
+  margin-top: 4px;
+}
+.menu-list {
+  padding: 12px;
+}
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.25s var(--ease-smooth);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+.menu-item:hover { background: rgba(255,228,160,0.4); }
+.menu-item .icon { font-size: 22px; }
+.menu-badge {
+  margin-left: auto;
+  background: var(--sakura-pink);
+  color: #FFF;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+/* ============================================================
+   🍰 内容区
+   ============================================================ */
+.content {
+  padding: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   🎴 状态信息卡片（磨砂玻璃）
+   ============================================================ */
+.status-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--radius-md);
+  padding: 24px 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(255,255,255,0.6);
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.35s var(--ease-smooth), transform 0.3s var(--ease-smooth);
+}
+.status-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+}
+.status-card::before {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 100px; height: 100px;
+  background: radial-gradient(circle, var(--cream-yellow) 0%, transparent 70%);
+  opacity: 0.5;
+  pointer-events: none;
+}
+/* 磨砂玻璃顶部高光 */
+.status-card::after,
+.nailong-quote::after,
+.streak-bar::after,
+.timeline-item::after,
+.ach-cell::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 12%; right: 12%;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,255,255,0.7) 20%,
+    rgba(255,255,255,0.9) 50%,
+    rgba(255,255,255,0.7) 80%,
+    transparent 100%);
+  border-radius: inherit;
+  pointer-events: none;
+}
+.status-nailong {
+  position: absolute;
+  right: -8px;
+  bottom: -10px;
+  width: 130px;
+  height: auto;
+  object-fit: contain;
+  z-index: 2;
+  pointer-events: none;
+}
+.status-label {
+  font-size: 13px;
+  color: var(--text-sub);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+.status-value {
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--text-main);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.status-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #34C759;
+  box-shadow: 0 0 8px #34C759;
+  animation: pulseDot 2s var(--ease-smooth) infinite;
+}
+.status-dot.offline {
+  background: #FF9F0A;
+  box-shadow: 0 0 8px #FF9F0A;
+}
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.3); opacity: 0.7; }
+}
+.status-detail {
+  font-size: 14px;
+  color: var(--text-sub);
+  font-weight: 600;
+}
+
+/* ============================================================
+   💬 奶龙语录气泡
+   ============================================================ */
+.nailong-quote {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(255,255,255,0.6);
+  font-size: 14px;
+  color: var(--text-main);
+  font-weight: 600;
+  line-height: 1.6;
+  position: relative;
+  overflow: hidden;
+  animation: quoteFadeIn 0.5s var(--ease-smooth) both;
+}
+.nailong-quote::before {
+  content: '';
+  position: absolute;
+  top: 4px; right: 6px;
+  width: 44px; height: 44px;
+  background: url('nailong-eat.png') center/contain no-repeat;
+  opacity: 0.18;
+  transform: rotate(8deg);
+  pointer-events: none;
+}
+@keyframes quoteFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.quote-text { position: relative; z-index: 1; padding-right: 30px; }
+
+/* ============================================================
+   😤 闲置催促气泡
+   ============================================================ */
+.idle-bubble {
+  position: fixed;
+  bottom: 90px; right: 15px;
+  background: linear-gradient(135deg, var(--sakura-pink), var(--peach));
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 16px;
+  border-radius: 20px 20px 20px 4px;
+  box-shadow: 0 4px 20px rgba(255,179,186,0.35), 0 1px 4px rgba(255,179,186,0.2);
+  z-index: 90;
+  opacity: 0;
+  transform: translateY(10px) scale(0.8);
+  transition: all 0.4s var(--ease-spring);
+  pointer-events: none;
+  max-width: 200px;
+}
+.idle-bubble.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* ============================================================
+   🔥 连续签到计数器
+   ============================================================ */
+.streak-bar {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(255,255,255,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.streak-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.streak-label {
+  font-size: 12px;
+  color: var(--text-sub);
+  font-weight: 700;
+}
+.streak-num {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+.streak-fire {
+  font-size: 32px;
+  animation: fireWiggle 1.5s var(--ease-smooth) infinite;
+}
+@keyframes fireWiggle {
+  0%, 100% { transform: scale(1) rotate(-5deg); }
+  50%      { transform: scale(1.15) rotate(5deg); }
+}
+
+/* ============================================================
+   🎯 快速操作三大功能卡片
+   核心：奶龙图片100%不透明，无遮罩，清晰可见
+   ============================================================ */
+.action-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.action-card {
+  position: relative;
+  border-radius: var(--radius-md);
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 20px;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.3s var(--ease-spring),
+              box-shadow 0.3s var(--ease-smooth),
+              border-color 0.3s;
+  border: 3px solid rgba(255,255,255,0.5);
+}
+/* hover 放大 */
+.action-card:hover {
+  transform: scale(1.03) translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: rgba(255,255,255,0.8);
+}
+.action-card:active {
+  transform: scale(0.97) translateY(1px);
+  transition-duration: 0.15s;
+}
+/* 卡片光泽扫过 */
+.action-card::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -100%;
+  width: 40%; height: 200%;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.25) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  transform: skewX(-15deg);
+  transition: left 0.7s var(--ease-smooth);
+  pointer-events: none;
+  z-index: 3;
+  border-radius: inherit;
+}
+.action-card:hover::before {
+  left: 160%;
+}
+
+/* ----- 奶龙背景图（100%不透明，无遮罩） ----- */
+.action-card .card-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 40%; /* 签到脸部位置 */
+  opacity: 1; /* ✅ 完全不透明 */
+  z-index: 0;
+  /* 无滤镜，无遮罩 */
+}
+
+/* ----- 底部文字区域（带轻微渐变底条确保可读性） ----- */
+/* 注意：不是全卡片遮罩，只是底部一小条渐变 */
+.action-card .card-text-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 55%;
+  background: linear-gradient(to top,
+    rgba(255,255,255,0.95) 0%,
+    rgba(255,255,255,0.7) 40%,
+    transparent 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ----- 文字内容（在底条之上） ----- */
+.action-card .card-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  width: 100%;
+}
+.action-card .card-icon {
+  font-size: 32px;
+  margin-bottom: 4px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+}
+.action-card .card-name {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--text-main);
+  text-shadow: 0 1px 2px rgba(255,255,255,0.9);
+  letter-spacing: 1px;
+}
+.action-card .card-name-en {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-sub);
+  margin-top: 2px;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.9);
+}
+
+/* ----- 卡片边框色彩 ----- */
+.action-card.checkin  { border-color: rgba(160,216,239,0.6); }
+.action-card.tempout  { border-color: rgba(255,214,165,0.6); }
+.action-card.tempout .card-bg-img { object-position: center 70%; }
+.action-card.checkout { border-color: rgba(255,179,186,0.6); }
+.action-card.checkout .card-bg-img { object-position: center 95%; }
+
+/* ----- hover 弹出迷你奶龙表情 ----- */
+.action-card .mini-nailong {
+  position: absolute;
+  width: 50px; height: 50px;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(10px) scale(0.5);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+}
+.action-card.checkin .mini-nailong  { top: 8px; right: 8px; }
+.action-card.tempout .mini-nailong  { top: 8px; left: 8px; }
+.action-card.checkout .mini-nailong { bottom: 55px; right: 12px; }
+
+.action-card:hover .mini-nailong {
+  opacity: 1;
+  transform: translateY(0) scale(1) rotate(10deg);
+}
+
+/* ============================================================
+   📜 签到时间线
+   ============================================================ */
+.history-section { margin-bottom: 20px; }
+.history-title {
+  font-size: 13px;
+  color: var(--text-sub);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 8px 4px 16px;
+}
+.timeline {
+  position: relative;
+  padding-left: 32px;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 12px; top: 8px; bottom: 8px;
+  width: 3px;
+  background: linear-gradient(to bottom, var(--checkin-color), var(--tempout-color), var(--checkout-color));
+  border-radius: 2px;
+}
+.timeline-item {
+  position: relative;
+  margin-bottom: 16px;
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(255,255,255,0.5);
+  transition: transform 0.25s var(--ease-smooth), box-shadow 0.25s;
+}
+.timeline-item:last-child { margin-bottom: 0; }
+.timeline-item:hover { transform: translateX(4px); box-shadow: var(--shadow-elevated); }
+.timeline-dot {
+  position: absolute;
+  left: -26px; top: 14px;
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  border: 3px solid #FFF;
+  box-shadow: 0 0 6px rgba(0,0,0,0.15);
+}
+.timeline-dot.in   { background: var(--checkin-color); }
+.timeline-dot.temp { background: var(--tempout-color); }
+.timeline-dot.out  { background: var(--checkout-color); }
+.timeline-action {
+  font-size: 15px; font-weight: 800;
+  color: var(--text-main);
+}
+.timeline-time {
+  font-size: 12px; color: var(--text-sub);
+  font-weight: 600; margin-top: 2px;
+}
+
+/* ============================================================
+   🍥 加载动画（奶龙旋转）
+   ============================================================ */
+.loading-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 50;
+  background: rgba(255, 249, 232, 0.92);
+  backdrop-filter: blur(8px);
+  align-items: center; justify-content: center;
+  flex-direction: column;
+}
+.loading-overlay.show { display: flex; }
+.nailong-loader {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  animation: nailongSpin 1.2s var(--ease-smooth) infinite;
+  box-shadow: 0 8px 24px rgba(255, 179, 71, 0.3);
+}
+@keyframes nailongSpin {
+  0%   { transform: rotate(0deg) scale(1); }
+  50%  { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+.loading-text {
+  margin-top: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-sub);
+}
+
+/* ============================================================
+   🎉 结果弹窗（奶油风格）
+   ============================================================ */
+.result-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(90, 74, 58, 0.25);
+  align-items: flex-end; justify-content: center;
+  backdrop-filter: blur(6px);
+}
+.result-overlay.show { display: flex; }
+.result-sheet {
+  background: linear-gradient(180deg, #FFFDF7 0%, #FFF9E8 100%);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: 20px 20px 36px;
+  width: 100%;
+  max-width: 480px;
+  animation: slideUp 0.4s var(--ease-smooth);
+  box-shadow: 0 -8px 48px rgba(0,0,0,0.14), 0 -2px 12px rgba(0,0,0,0.08);
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.result-indicator {
+  width: 40px; height: 5px;
+  background: var(--cream-yellow);
+  border-radius: 3px;
+  margin: 0 auto 20px;
+}
+.result-icon {
+  font-size: 52px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+.result-title {
+  font-size: 22px; font-weight: 900;
+  text-align: center; color: var(--text-main);
+  margin-bottom: 8px;
+}
+.result-msg {
+  font-size: 15px; color: var(--text-sub);
+  text-align: center;
+  margin-bottom: 20px;
+  line-height: 1.6;
+  font-weight: 600;
+}
+.result-url {
+  background: rgba(255,255,255,0.8);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  word-break: break-all;
+  font-size: 13px;
+  color: #8B7355;
+  font-family: 'SF Mono', 'Menlo', monospace;
+  border: 2px dashed var(--cream-yellow);
+}
+.btn-cream {
+  width: 100%; height: 54px;
+  background: linear-gradient(135deg, var(--cream-yellow), var(--peach));
+  color: var(--text-main);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 17px;
+  font-weight: 800;
+  cursor: pointer;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow-btn);
+  transition: all 0.4s var(--ease-spring);
+  font-family: var(--font-cartoon);
+  position: relative;
+  overflow: hidden;
+}
+.btn-cream:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-btn-hover);
+}
+.btn-cream:active {
+  transform: scale(0.96) translateY(1px);
+  box-shadow: var(--shadow-btn-press);
+}
+/* 按钮光泽扫过效果 */
+.btn-cream::after {
+  content: '';
+  position: absolute;
+  top: -50%; left: -100%;
+  width: 50%; height: 200%;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.35) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  transform: skewX(-20deg);
+  transition: left 0.6s var(--ease-smooth);
+  pointer-events: none;
+}
+.btn-cream:hover::after {
+  left: 150%;
+}
+.btn-cream-secondary {
+  width: 100%; height: 54px;
+  background: rgba(255,255,255,0.7);
+  color: var(--text-sub);
+  border: 2px solid var(--cream-yellow);
+  border-radius: var(--radius-sm);
+  font-size: 17px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.25s var(--ease-smooth);
+  font-family: var(--font-cartoon);
+  box-shadow: var(--shadow-contact), var(--shadow-mid);
+}
+.btn-cream-secondary:hover {
+  background: rgba(255,228,160,0.5);
+}
+.btn-cream-secondary:active { transform: scale(0.96) translateY(1px); background: var(--cream-yellow); color: var(--text-main); }
+
+/* ============================================================
+   🏆 成就展示栏
+   ============================================================ */
+.achievement-section {
+  margin-bottom: 20px;
+}
+.ach-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.ach-cell {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border-radius: var(--radius-sm);
+  padding: 12px 8px 10px;
+  text-align: center;
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(255,255,255,0.5);
+  transition: all 0.3s var(--ease-smooth);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.ach-cell:active { transform: scale(0.94); }
+.ach-cell.locked {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
+.ach-cell.locked .ach-cell-icon {
+  filter: grayscale(1) brightness(0.7);
+}
+.ach-cell.unlocked .ach-cell-icon {
+  animation: achIconFloat 3s var(--ease-spring) infinite;
+}
+@keyframes achIconFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25%      { transform: translateY(-4px) rotate(-3deg); }
+  75%      { transform: translateY(-2px) rotate(3deg); }
+}
+.ach-cell-icon {
+  font-size: 28px;
+  display: block;
+  margin-bottom: 4px;
+  transition: transform 0.3s var(--ease-spring);
+}
+.ach-cell-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.3;
+}
+.ach-cell.locked .ach-cell-name {
+  color: var(--text-sub);
+}
+.ach-cell-desc {
+  display: none; /* 点击时在 tooltip 中展示 */
+}
+/* 新解锁闪光 - 弹性过冲 */
+.ach-cell.just-unlocked {
+  animation: achUnlock 0.8s var(--ease-bounce) both;
+}
+@keyframes achUnlock {
+  0%   { transform: scale(0.7); opacity: 0; box-shadow: 0 0 0 0 rgba(255,179,71,0); }
+  40%  { transform: scale(1.18); opacity: 1; box-shadow: 0 0 24px 8px rgba(255,179,71,0.35); }
+  60%  { transform: scale(0.95); box-shadow: 0 0 12px 4px rgba(255,179,71,0.2); }
+  80%  { transform: scale(1.04); box-shadow: 0 0 6px 2px rgba(255,179,71,0.15); }
+  100% { transform: scale(1); opacity: 1; box-shadow: var(--shadow-card-hover); }
+}
+/* 解锁后持续光晕脉冲 */
+.ach-cell.just-unlocked::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--cream-yellow), var(--sakura-pink));
+  z-index: -1;
+  animation: achGlowPulse 2s var(--ease-smooth) both;
+  opacity: 0.5;
+}
+@keyframes achGlowPulse {
+  0% { opacity: 0.6; transform: scale(1.05); }
+  100% { opacity: 0; transform: scale(1.15); }
+}
+
+/* 成就详情 tooltip */
+.ach-tooltip {
+  position: fixed;
+  bottom: 160px; left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: linear-gradient(135deg, #FFF9E8, #FFE4A0);
+  color: var(--text-main);
+  padding: 14px 22px;
+  border-radius: var(--radius-xl);
+  font-size: 14px;
+  font-weight: 700;
+  z-index: 250;
+  box-shadow: 0 8px 32px rgba(255,179,71,0.35), 0 2px 8px rgba(139,119,99,0.12);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease-smooth);
+  white-space: nowrap;
+  text-align: center;
+}
+.ach-tooltip.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.ach-tooltip-icon { font-size: 22px; }
+.ach-tooltip-name { display: block; font-size: 16px; font-weight: 800; margin: 4px 0 2px; }
+.ach-tooltip-desc { font-size: 12px; color: #8B7355; font-weight: 600; }
+
+/* ============================================================
+   🍞 底部版本提示
+   ============================================================ */
+.footer {
+  text-align: center;
+  padding: 16px;
+  font-size: 13px;
+  color: var(--text-sub);
+  font-weight: 600;
+  line-height: 1.6;
+}
+.footer .heart { color: #FF8A80; }
+
+.footer-nailong {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+.footer-nailong img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+}
+.footer-nailong:active img { transform: scale(1.1) rotate(-5deg); }
+
+/* ============================================================
+   🔔 Toast
+   ============================================================ */
+.toast {
+  position: fixed;
+  bottom: 100px; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--cream-yellow), var(--peach));
+  color: var(--text-main);
+  padding: 14px 28px;
+  border-radius: var(--radius-xl);
+  font-size: 15px;
+  font-weight: 800;
+  z-index: 200;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: var(--shadow-elevated);
+  transition: opacity 0.3s var(--ease-smooth), transform 0.3s var(--ease-smooth);
+}
+.toast.show { opacity: 1; }
+
+/* ============================================================
+   🎊 撒花/彩纸动画
+   ============================================================ */
+.confetti-container {
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  overflow: hidden;
+}
+.confetti-piece {
+  position: absolute;
+  width: 10px; height: 10px;
+  top: -20px;
+  opacity: 0;
+  animation: confettiFall 1.8s ease-in forwards;
+}
+.confetti-piece.circle { border-radius: 50%; }
+.confetti-piece.star   { border-radius: 2px; clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
+.confetti-piece.strip  { width: 6px; height: 16px; border-radius: 3px; }
+
+@keyframes confettiFall {
+  0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg) scale(0.3); opacity: 0; }
+}
+
+/* 签到成功奶龙弹跳 - 多段弹性 */
+.nailong-bounce {
+  animation: nailongBounce 0.7s var(--ease-bounce);
+}
+@keyframes nailongBounce {
+  0%   { transform: scale(1) rotate(0deg); }
+  20%  { transform: scale(1.35) rotate(-12deg); }
+  40%  { transform: scale(0.88) rotate(6deg); }
+  60%  { transform: scale(1.12) rotate(-4deg); }
+  80%  { transform: scale(0.97) rotate(2deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* ============================================================
+   🍃 季节飘落装饰（CSS only）
+   ============================================================ */
+.season-particle {
+  position: fixed;
+  top: -30px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+  font-size: 18px;
+  animation: seasonFall linear infinite;
+}
+@keyframes seasonFall {
+  0%   { transform: translateY(-5vh) translateX(0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 0.6; }
+  90%  { opacity: 0.4; }
+  100% { transform: translateY(105vh) translateX(60px) rotate(360deg); opacity: 0; }
+}
+body[data-period="night"] .season-particle { opacity: 0.3; }
+
+/* ============================================================
+   🏆 成就弹窗
+   ============================================================ */
+.achievement-toast {
+  position: fixed;
+  top: 80px; left: 50%;
+  transform: translateX(-50%) translateY(-120%);
+  background: linear-gradient(135deg, #FFF9E8, #FFE4A0, #FFD4B3);
+  color: var(--text-main);
+  padding: 16px 24px;
+  border-radius: var(--radius-xl);
+  font-size: 15px;
+  font-weight: 800;
+  z-index: 300;
+  box-shadow: 0 8px 40px rgba(255,179,71,0.45), 0 2px 12px rgba(139,119,99,0.15);
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  text-align: center;
+  max-width: 300px;
+  white-space: nowrap;
+}
+.achievement-toast.show {
+  transform: translateX(-50%) translateY(0);
+}
+.achievement-toast .ach-icon { font-size: 28px; display: block; margin-bottom: 4px; }
+.achievement-toast .ach-name { font-size: 13px; color: var(--text-sub); font-weight: 600; margin-top: 4px; }
+
+/* ============================================================
+   🥚 长按奶龙彩蛋
+   ============================================================ */
+.easter-egg-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(255,249,232,0.95);
+  backdrop-filter: blur(10px);
+  align-items: center; justify-content: center;
+  flex-direction: column;
+}
+.easter-egg-overlay.show { display: flex; }
+.easter-egg-img {
+  width: 150px; height: 150px;
+  object-fit: contain;
+  animation: easterEggSpin 1s ease-in-out;
+  filter: drop-shadow(0 8px 24px rgba(255,179,71,0.4));
+}
+@keyframes easterEggSpin {
+  0%   { transform: scale(0) rotate(-180deg); }
+  60%  { transform: scale(1.2) rotate(10deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+.easter-egg-text {
+  margin-top: 20px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-main);
+  text-align: center;
+  animation: eggTextIn 0.6s 0.5s ease-out both;
+}
+@keyframes eggTextIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.easter-egg-sub {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--text-sub);
+  font-weight: 600;
+  animation: eggTextIn 0.6s 0.8s ease-out both;
+}
+
+/* ============================================================
+   ⚠️ 错误提示
+   ============================================================ */
+.error-banner {
+  display: none;
+  background: linear-gradient(135deg, #FFE8E8, #FFF0F0);
+  border: 2px solid #FFB3BA;
+  border-radius: var(--radius-sm);
+  padding: 14px 16px 50px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #E57373;
+  line-height: 1.5;
+  font-weight: 700;
+  position: relative;
+  overflow: hidden;
+}
+.error-banner.show { display: block; }
+.error-nailong {
+  position: absolute;
+  right: -6px; bottom: -10px;
+  width: 60px; height: 60px;
+  object-fit: contain;
+  pointer-events: none;
+  opacity: 0.85;
+}
+.error-banner .retry-btn {
+  color: #FF8A65;
+  font-weight: 800;
+  cursor: pointer;
+  margin-left: 4px;
+  text-decoration: underline;
+}
+
+/* ============================================================
+   💻 电脑端适配
+   ============================================================ */
+@media (min-width: 768px) {
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  .phone-frame {
+    width: 100%;
+    max-width: 440px;
+    min-height: auto;
+    border-radius: var(--radius-xl);
+    box-shadow: 0 20px 64px rgba(139, 119, 99, 0.22),
+                0 4px 16px rgba(139, 119, 99, 0.12);
+    overflow: hidden;
+    background: var(--bg-page);
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== ☁️ 漂浮云朵 ===== -->
+<div class="cloud cloud-1"></div>
+<div class="cloud cloud-2"></div>
+<div class="cloud cloud-3"></div>
+
+<!-- ===== 🐉 迷你奶龙贴纸（页面边角） ===== -->
+<div class="sticker sticker-tr">
+  <img src="nailong3.png" alt="奶龙">
+</div>
+<div class="sticker sticker-bl">
+  <img src="nailong5.png" alt="奶龙">
+</div>
+<div class="sticker sticker-br">
+  <img src="nailong6.png" alt="奶龙">
+</div>
+
+<!-- ===== 📱 手机框架 ===== -->
+<div class="phone-frame">
+
+  <!-- ===== 🔝 顶部导航栏 ===== -->
+  <nav class="top-nav">
+    <div class="nav-left">
+      <button class="menu-btn" onclick="toggleMenu()">☰</button>
+      <span class="nav-title"><img src="nailong-icon.png" class="nav-icon" alt="">奶龙签到</span>
+    </div>
+    <span class="nav-time" id="navTime">9:41</span>
+  </nav>
+
+  <!-- ===== 📋 侧边菜单栏 ===== -->
+  <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+  <aside class="side-menu" id="sideMenu">
+    <div class="menu-header">
+      <img src="nailong3.png" class="menu-avatar" alt="奶龙头像">
+      <h3>奶龙图书馆</h3>
+      <p>SDUFE Library Check-in</p>
+    </div>
+    <div class="menu-list">
+      <div class="menu-item" onclick="toggleMenu(); showToast('已刷新状态')">
+        <span class="icon">🔄</span>
+        <span>刷新状态</span>
+      </div>
+      <div class="menu-item" onclick="toggleMenu(); document.getElementById('historySection').scrollIntoView({behavior:'smooth'})">
+        <span class="icon">📜</span>
+        <span>今日记录</span>
+        <span class="menu-badge" id="menuBadge" style="display:none">0</span>
+      </div>
+      <div class="menu-item" onclick="toggleMenu(); showToast('v2.6 文案优化版')">
+        <span class="icon">ℹ️</span>
+        <span>关于</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== 🍰 内容区 ===== -->
+  <main class="content">
+
+    <!-- 错误提示 -->
+    <div class="error-banner" id="errorBanner">
+      <span id="errorText">网络错误，请连接校园网 SDUFE WiFi</span>
+      <span class="retry-btn" onclick="retryTimestamp()">重试</span>
+      <img src="nailong-surprise.png" class="error-nailong" alt="惊讶奶龙">
+    </div>
+
+    <!-- ===== 🎴 状态信息卡片 ===== -->
+    <div class="status-card">
+      <img src="nailong-urge.png" class="status-nailong" id="statusNailong" alt="奶龙状态">
+      <div class="status-label">📡 当前状态</div>
+      <div class="status-value">
+        <span class="status-dot offline" id="statusDot"></span>
+        <span id="statusValue">未连接</span>
+      </div>
+      <div class="status-detail" id="statusDetail">请连接校园网后自动获取状态</div>
+    </div>
+
+<!-- ===== 💬 奶龙语录 ===== -->
+<div class="nailong-quote" id="quoteBox">
+  <div class="quote-text" id="quoteText">今天也是适合签到的一天</div>
+</div>
+
+<!-- ===== 😤 闲置催促气泡 ===== -->
+<div class="idle-bubble" id="idleBubble">你在看什么？快去签到！</div>
+
+    <!-- ===== 🔥 连续签到计数器 ===== -->
+    <div class="streak-bar">
+      <div class="streak-info">
+        <span class="streak-label">连续签到</span>
+        <span class="streak-num" id="streakNum">0 天</span>
+      </div>
+      <span class="streak-fire">🔥</span>
+    </div>
+
+    <!-- ===== 🎯 快速操作三大功能卡片 ===== -->
+    <div class="action-grid">
+      <!-- 签到入馆 -->
+      <div class="action-card checkin" onclick="doAction('1')">
+        <!-- 奶龙背景图：100%不透明，无遮罩 -->
+        <img src="nailong3.png" class="card-bg-img" alt="签到奶龙">
+        <!-- 底部渐变文字底条（仅底部，非全卡片遮罩） -->
+        <div class="card-text-bar"></div>
+        <!-- hover 弹出迷你奶龙 -->
+        <img src="nailong1.png" class="mini-nailong" alt="迷你奶龙">
+        <div class="card-content">
+          <div class="card-icon">📍</div>
+          <div class="card-name">签到入馆</div>
+          <div class="card-name-en">Check In</div>
+        </div>
+      </div>
+
+      <!-- 临时离馆 -->
+      <div class="action-card tempout" onclick="doAction('2')">
+        <img src="nailong2.png" class="card-bg-img" alt="暂离奶龙">
+        <div class="card-text-bar"></div>
+        <img src="nailong4.png" class="mini-nailong" alt="迷你奶龙">
+        <div class="card-content">
+          <div class="card-icon">🚶</div>
+          <div class="card-name">临时离馆</div>
+          <div class="card-name-en">Temp Out</div>
+        </div>
+      </div>
+
+      <!-- 签离出馆 -->
+      <div class="action-card checkout" onclick="doAction('3')">
+        <img src="nailong4.png" class="card-bg-img" alt="签离奶龙">
+        <div class="card-text-bar"></div>
+        <img src="nailong5.png" class="mini-nailong" alt="迷你奶龙">
+        <div class="card-content">
+          <div class="card-icon">🚪</div>
+          <div class="card-name">签离出馆</div>
+          <div class="card-name-en">Check Out</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 📜 历史记录 ===== -->
+    <div class="history-section" id="historySection" style="display:none;">
+      <div class="history-title">📜 今日记录 · TODAY</div>
+      <div id="historyList" class="timeline"></div>
+    </div>
+
+    <!-- ===== 🏆 成就展示栏 ===== -->
+    <div class="achievement-section">
+      <div class="history-title">成就 · ACHIEVEMENTS</div>
+      <div class="ach-grid" id="achGrid"></div>
+    </div>
+
+    <!-- ===== 🦵 彩蛋奶龙 ===== -->
+    <div class="footer-nailong">
+      <img src="nailong-longleg.jpg" alt="长腿奶龙">
+    </div>
+
+    <!-- ===== 🍞 底部版本提示 ===== -->
+    <div class="footer">
+      <span class="heart">❤</span> SDUFE Library Remote Check-in v2.5<br>
+      奶龙奶油卡通风 · 请连接校园网使用
+    </div>
+
+  </main>
+</div>
+
+<!-- ===== 🍥 加载动画 ===== -->
+<div class="loading-overlay" id="loading">
+  <img src="nailong-sleep.png" class="nailong-loader" alt="奶龙加载中">
+  <div class="loading-text">奶龙正在获取时间...💤</div>
+</div>
+
+<!-- ===== 🎉 结果弹窗 ===== -->
+<div class="result-overlay" id="resultOverlay" onclick="if(event.target===this)closeResult()">
+  <div class="result-sheet">
+    <div class="result-indicator"></div>
+    <div class="result-icon" id="resultIcon">✅</div>
+    <div class="result-title" id="resultTitle">操作成功</div>
+    <div class="result-msg" id="resultMsg">请点击下方按钮跳转到图书馆</div>
+    <div class="result-url" id="resultUrl" style="display:none;"></div>
+    <button class="btn-cream" id="resultBtn" onclick="goToLibrary()">📱 跳转到图书馆</button>
+    <button class="btn-cream-secondary" onclick="copyLink()" id="copyBtn">📋 复制链接</button>
+  </div>
+</div>
+
+
+
+<!-- ===== 🏆 成就详情 tooltip ===== -->
+<div class="ach-tooltip" id="achTooltip">
+  <span class="ach-tooltip-icon" id="achTipIcon">🌟</span>
+  <span class="ach-tooltip-name" id="achTipName">初来乍到</span>
+  <span class="ach-tooltip-desc" id="achTipDesc">完成第一次签到</span>
+</div>
+
+<!-- ===== 🥚 长按彩蛋 ===== -->
+<div class="easter-egg-overlay" id="easterEgg" onclick="this.classList.remove('show')">
+  <img src="nailong3.png" class="easter-egg-img" alt="彩蛋奶龙">
+  <div class="easter-egg-text" id="eggText">你发现了奶龙的秘密！</div>
+  <div class="easter-egg-sub">点击任意处关闭</div>
+</div>
+
+<!-- ===== 🔔 Toast ===== -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== 🎊 撒花容器 ===== -->
+<div class="confetti-container" id="confettiBox"></div>
+
+<!-- ===== 🐉 滚动跟随浮动奶龙 ===== -->
+<img src="nailong1.png" class="scroll-nailong" id="scrollNailong" alt="浮动奶龙">
+
+<!-- ===== 🍃 季节飘落装饰容器 ===== -->
+<div id="seasonBox"></div>
+
+<script>
+// ============================================================
+// 🎨 奶龙签到系统 · 原生 JS
+// ============================================================
+
+// ===== 时间更新 =====
+function updateTime() {
+  const now = new Date();
+  let h = now.getHours(), m = now.getMinutes();
+  document.getElementById('navTime').textContent =
+    h + ':' + (m < 10 ? '0' : '') + m;
+}
+// ===== 🔥 连续签到计数器 =====
+function updateStreak() {
+  const today = new Date().toISOString().slice(0, 10);
+  const lastDate = localStorage.getItem('lastCheckinDate');
+  const streak = parseInt(localStorage.getItem('checkinStreak') || '0');
+
+  if (lastDate === today) {
+    // 今天已经签过，只更新显示
+    document.getElementById('streakNum').textContent = streak + ' 天';
+    return streak;
+  }
+
+  // 计算日期差
+  const last = new Date(lastDate);
+  const diff = Math.floor((new Date(today) - last) / 86400000);
+
+  let newStreak = streak;
+  if (diff === 1) {
+    // 昨天签过，连续+1
+    newStreak = streak + 1;
+  } else if (diff > 1) {
+    // 断签了，重置
+    newStreak = 1;
+  } else if (!lastDate || isNaN(diff)) {
+    newStreak = 1;
+  }
+
+  document.getElementById('streakNum').textContent = newStreak + ' 天';
+  return newStreak;
+}
+
+function recordCheckin() {
+  const today = new Date().toISOString().slice(0, 10);
+  const streak = updateStreak();
+  localStorage.setItem('lastCheckinDate', today);
+  localStorage.setItem('checkinStreak', String(streak));
+}
+updateStreak(); // 页面加载时显示
+function applyTimeTheme() {
+  const h = new Date().getHours();
+  const body = document.body;
+  const detail = document.getElementById('statusDetail');
+  let theme = '', greeting = '';
+  if (h >= 6 && h < 12) {
+    theme = 'morning'; greeting = '早安！新的一天开始啦~';
+  } else if (h >= 12 && h < 14) {
+    theme = 'noon'; greeting = '午安~吃饱了才有力气学习';
+  } else if (h >= 14 && h < 18) {
+    theme = 'afternoon'; greeting = '下午好！继续加油鸭';
+  } else if (h >= 18 && h < 22) {
+    theme = 'evening'; greeting = '晚上好~图书馆还不闭门';
+  } else {
+    theme = 'night'; greeting = '夜深了...奶龙劝你早点休息';
+  }
+  body.setAttribute('data-period', theme);
+  if (!localStorage.getItem('checkedIn')) {
+    detail.textContent = greeting;
+  }
+}
+applyTimeTheme();
+updateTime();
+setInterval(updateTime, 30000);
+renderCheckInStatus();
+
+// ===== 菜单切换 =====
+function toggleMenu() {
+  document.getElementById('sideMenu').classList.toggle('open');
+  document.getElementById('menuOverlay').classList.toggle('show');
+}
+
+// ===== 奶龙签到状态渲染 =====
+function renderCheckInStatus() {
+  const isCheckedIn = localStorage.getItem('checkedIn') === 'true';
+  const nailongImg = document.getElementById('statusNailong');
+  const statusValue = document.getElementById('statusValue');
+  const statusDetail = document.getElementById('statusDetail');
+  const statusDot = document.getElementById('statusDot');
+
+  if (isCheckedIn) {
+    nailongImg.src = 'nailong-happy.png';
+    statusValue.textContent = '已签到 ✓';
+    statusDetail.textContent = '奶龙确认你人还在，继续卷';
+    statusDot.classList.remove('offline');
+  } else {
+    nailongImg.src = 'nailong-urge.png';
+    statusValue.textContent = '未签到';
+    statusDetail.textContent = '快去签到！奶龙眼神已经不对了';
+    statusDot.classList.add('offline');
+  }
+}
+
+// ===== 状态更新（网络健康检查） =====
+function updateStatus() {
+  fetch('https://libst.sdufe.edu.cn/api.php/v3qrtime', {
+    mode: 'cors', cache: 'no-cache'
+  }).then(r => r.json()).then(d => {
+    if (d && d.status === 1) {
+      document.getElementById('errorBanner').classList.remove('show');
+      renderCheckInStatus();
+    }
+  }).catch(() => {
+    document.getElementById('errorBanner').classList.add('show');
+    document.getElementById('statusValue').textContent = '未连接';
+    document.getElementById('statusDot').classList.add('offline');
+    document.getElementById('statusDetail').textContent = '请连接校园网 SDUFE WiFi';
+  });
+}
+setTimeout(updateStatus, 500);
+setInterval(updateStatus, 60000);
+
+function retryTimestamp() {
+  document.getElementById('errorBanner').classList.remove('show');
+  updateStatus();
+  showToast('奶龙正在重试...');
+}
+
+// ===== 奶龙语音播报 =====
+function speakNailong(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'zh-CN';
+  u.pitch = 1.3;   // 音调高一点，奶龙声
+  u.rate = 0.95;   // 稍微慢一点，可爱感
+  u.volume = 1;
+  // 尝试选中文女声
+  const voices = window.speechSynthesis.getVoices();
+  const zhVoice = voices.find(v => v.lang.startsWith('zh') && v.name.includes('Female'))
+               || voices.find(v => v.lang.startsWith('zh'))
+               || voices[0];
+  if (zhVoice) u.voice = zhVoice;
+  window.speechSynthesis.speak(u);
+}
+// 预加载语音列表（部分浏览器异步加载）
+if ('speechSynthesis' in window) {
+  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+}
+
+// ===== 核心操作 =====
+let currentUrl = '';
+
+function doAction(type) {
+  const names = { '1': '签到入馆', '2': '临时离馆', '3': '签离出馆' };
+  const msgs  = { '1': '签到成功啦~奶龙陪你学习！', '2': '临时离馆~记得早点回来哦！', '3': '签离出馆~奶龙明天见！' };
+
+  // 同步触发语音（必须在用户手势的同步调用栈中，移动端才能播放）
+  speakNailong(msgs[type]);
+
+  document.getElementById('loading').classList.add('show');
+
+  fetch('https://libst.sdufe.edu.cn/api.php/v3qrtime', { mode: 'cors', cache: 'no-cache' })
+    .then(r => r.json())
+    .then(d => {
+      document.getElementById('loading').classList.remove('show');
+      if (!d || d.status !== 1) {
+        showToast('获取时间戳失败，请确认已连接校园网');
+        return;
+      }
+      const ts = d.data;
+      const url = 'http://www.skalibrary.net/wx/scancheck?school=sdufe&type=' + type + '&t=' + ts;
+      currentUrl = url;
+
+      // 保存签到状态
+      if (type === '1') {
+        localStorage.setItem('checkedIn', 'true');
+        recordCheckin();
+        localStorage.setItem('totalCheckins', String(parseInt(localStorage.getItem('totalCheckins')||'0') + 1));
+        setTimeout(checkAchievements, 1500);
+      }
+      if (type === '3') {
+        localStorage.setItem('checkedIn', 'false');
+        setTimeout(checkAchievements, 1500);
+      }
+      // type '2' 临时离馆不改变状态
+      renderCheckInStatus();
+
+      addHistory(type, ts);
+
+      // 奶龙弹跳 + 撒花
+      const nailongEl = document.getElementById('statusNailong');
+      nailongEl.classList.remove('nailong-bounce');
+      void nailongEl.offsetWidth; // 触发 reflow 重播动画
+      nailongEl.classList.add('nailong-bounce');
+      launchConfetti();
+
+      document.getElementById('resultIcon').textContent = '🎉';
+      document.getElementById('resultTitle').textContent = names[type] + ' 成功！';
+      document.getElementById('resultMsg').textContent =
+        '时间戳: ' + ts + '\n链接已就绪，快去微信完成' + names[type] + '\n（奶龙提醒：别看了，快去签）';
+      document.getElementById('resultUrl').style.display = 'block';
+      document.getElementById('resultUrl').textContent = url;
+      document.getElementById('resultOverlay').classList.add('show');
+    })
+    .catch(() => {
+      document.getElementById('loading').classList.remove('show');
+      document.getElementById('errorBanner').classList.add('show');
+      document.getElementById('errorText').textContent =
+        '图书馆服务器又装死了（奶龙已帮你骂过）\n请确认已连接 SDUFE 校园网后重试';
+    });
+}
+
+function goToLibrary() {
+  if (!currentUrl) { showToast('链接为空'); return; }
+  window.location.href = currentUrl;
+}
+
+function copyLink() {
+  if (!currentUrl) { showToast('链接为空'); return; }
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(currentUrl).then(() => showToast('链接已复制'));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = currentUrl;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('链接已复制');
+  }
+}
+
+function closeResult() {
+  document.getElementById('resultOverlay').classList.remove('show');
+}
+
+// ===== 历史记录 =====
+function addHistory(type, ts) {
+  const names = { '1': '签到入馆', '2': '临时离馆', '3': '签离出馆' };
+  const dots = { '1': 'in', '2': 'temp', '3': 'out' };
+
+  const section = document.getElementById('historySection');
+  section.style.display = 'block';
+
+  const list = document.getElementById('historyList');
+  const now = new Date();
+  const timeStr = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+
+  const item = document.createElement('div');
+  item.className = 'timeline-item';
+  item.innerHTML =
+    '<div class="timeline-dot ' + dots[type] + '"></div>' +
+    '<div class="timeline-action">' + names[type] + '</div>' +
+    '<div class="timeline-time">' + timeStr + ' · 时间戳 ' + ts + '</div>';
+  list.insertBefore(item, list.firstChild);
+
+  // 更新菜单badge
+  const badge = document.getElementById('menuBadge');
+  badge.textContent = list.children.length;
+  badge.style.display = 'inline-block';
+}
+
+// ===== 🎊 撒花动画 =====
+function launchConfetti() {
+  const box = document.getElementById('confettiBox');
+  const colors = ['#FFB3BA','#FFD6A5','#B8F0D8','#A0D8EF','#E8D5F2','#FFE4A0','#FF8A80','#82B1FF'];
+  const shapes = ['circle','star','strip'];
+  for (let i = 0; i < 40; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece ' + shapes[Math.floor(Math.random()*shapes.length)];
+    el.style.left = Math.random() * 100 + '%';
+    el.style.background = colors[Math.floor(Math.random()*colors.length)];
+    el.style.animationDelay = (Math.random() * 0.6) + 's';
+    el.style.animationDuration = (1.2 + Math.random() * 1) + 's';
+    box.appendChild(el);
+  }
+  setTimeout(() => { box.innerHTML = ''; }, 3000);
+}
+
+// ===== Toast =====
+function showToast(msg) {
+  const msgs = {
+    '已刷新状态': '奶龙帮你刷新了，别墨迹',
+    'v2.5 质感升级版': 'v2.5 来了，奶龙又胖了一圈',
+    '获取时间戳失败，请确认已连接校园网': '图书馆服务器又装死了，奶龙已帮你骂过',
+    '链接已复制': '链接到手！快去微信签到，别让奶龙等',
+    '奶龙正在重试...': '奶龙正在狂敲图书馆服务器的大门...',
+    '网络错误：无法连接图书馆服务器，请确认已连接 SDUFE 校园网': '网断了？奶龙表示理解，毕竟山财的网...（懂的都懂）',
+  };
+  const t = document.getElementById('toast');
+  t.textContent = msgs[msg] || msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ===== ⏰ 22:00 闭馆提醒 =====
+function checkClosingReminder() {
+  const now = new Date();
+  const h = now.getHours(), m = now.getMinutes();
+  // 21:55 ~ 22:00 触发一次
+  if (h === 21 && m >= 55 && !localStorage.getItem('closingReminded_' + now.toISOString().slice(0,10))) {
+    localStorage.setItem('closingReminded_' + now.toISOString().slice(0,10), 'true');
+    speakNailong('快跑！图书馆要关门了！奶龙先撤了！');
+    showToast('⏰ 奶龙提醒：图书馆快关门了，快签离！');
+  }
+}
+setInterval(checkClosingReminder, 60000);
+setTimeout(checkClosingReminder, 5000);
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    reg.addEventListener('updatefound', () => {
+      const newWorker = reg.installing;
+      newWorker.addEventListener('statechange', () => {
+        if (newWorker.state === 'activated') {
+          // 自动刷新获取最新版本
+          if (navigator.serviceWorker.controller) {
+            window.location.reload();
+          }
+        }
+      });
+    });
+  }).catch(() => {});
+}
+
+// ===== 🥚 长按奶龙彩蛋 =====
+const EGG_TEXTS = [
+  '彩蛋触发！奶龙：你摸到我隐藏开关了？',
+  '奶龙说：长按的人都是有故事的',
+  '隐藏成就进度+1 —— 奶龙观察者',
+  '奶龙其实会瞬移，只是懒得演示',
+  '你比90%的人更有耐心（另外10%还在按）',
+  '奶龙被你摸头了，好羞涩（才怪）'
+];
+let longPressTimer = null;
+document.querySelectorAll('.sticker img, .scroll-nailong, .status-nailong, .nav-icon').forEach(el => {
+  el.style.cursor = 'pointer';
+  el.addEventListener('touchstart', e => {
+    longPressTimer = setTimeout(() => {
+      document.getElementById('eggText').textContent = EGG_TEXTS[Math.floor(Math.random()*EGG_TEXTS.length)];
+      document.getElementById('easterEgg').classList.add('show');
+      speakNailong('被你发现了！奶龙害羞了~');
+    }, 1500);
+  }, {passive:true});
+  el.addEventListener('touchend', () => clearTimeout(longPressTimer));
+  el.addEventListener('touchmove', () => clearTimeout(longPressTimer));
+  // 桌面端也支持
+  el.addEventListener('mousedown', () => {
+    longPressTimer = setTimeout(() => {
+      document.getElementById('eggText').textContent = EGG_TEXTS[Math.floor(Math.random()*EGG_TEXTS.length)];
+      document.getElementById('easterEgg').classList.add('show');
+      speakNailong('被你发现了！奶龙害羞了~');
+    }, 1500);
+  });
+  el.addEventListener('mouseup', () => clearTimeout(longPressTimer));
+  el.addEventListener('mouseleave', () => clearTimeout(longPressTimer));
+});
+
+// ===== 🏆 签到成就系统 =====
+const ACHIEVEMENTS = [
+  { id: 'first_checkin', name: '初来乍到',   desc: '第一次签到，奶龙见证了你的初次', icon: '🌟', check: () => parseInt(localStorage.getItem('totalCheckins')||'0') >= 1 },
+  { id: 'check_3',      name: '三天打鱼',   desc: '连续签到3天，开始上瘾了？', icon: '🐟', check: () => parseInt(localStorage.getItem('checkinStreak')||'0') >= 3 },
+  { id: 'check_7',      name: '一周冤种',   desc: '连续7天，你是真想学习还是真闲？', icon: '⚔️', check: () => parseInt(localStorage.getItem('checkinStreak')||'0') >= 7 },
+  { id: 'check_30',     name: '月度自虐',   desc: '连续30天，奶龙已经开始佩服你了', icon: '📚', check: () => parseInt(localStorage.getItem('checkinStreak')||'0') >= 30 },
+  { id: 'night_owl',    name: '深夜emo签',  desc: '23点后签到，是学习还是失眠？', icon: '🦉', check: () => new Date().getHours() >= 23 },
+  { id: 'early_bird',   name: '早起鬼见愁', desc: '8点前签到，你是人还是闹钟？', icon: '🐦', check: () => new Date().getHours() < 8 },
+  { id: 'back_forth',   name: '签了又签',   desc: '同一天签到+签离，你是在练习吗', icon: '🔄', check: () => localStorage.getItem('checkedIn')==='false' && localStorage.getItem('lastCheckinDate')===new Date().toISOString().slice(0,10) },
+  { id: 'total_10',     name: '签到卷王·初段', desc: '累计10次，你已经被奶龙标记为卷王候选人', icon: '🏅', check: () => parseInt(localStorage.getItem('totalCheckins')||'0') >= 10 },
+  { id: 'total_50',     name: '签到卷王·破壁', desc: '累计50次，图书馆阿姨已经认识你了', icon: '👑', check: () => parseInt(localStorage.getItem('totalCheckins')||'0') >= 50 },
+];
+
+function checkAchievements() {
+  const unlocked = JSON.parse(localStorage.getItem('unlockedAch') || '[]');
+  ACHIEVEMENTS.forEach(a => {
+    if (!unlocked.includes(a.id) && a.check()) {
+      unlocked.push(a.id);
+      showAchievement(a);
+    }
+  });
+  localStorage.setItem('unlockedAch', JSON.stringify(unlocked));
+}
+
+function showAchievement(a) {
+  speakNailong('恭喜解锁成就：' + a.name + '！');
+  renderAchievementGrid(a.id);
+  showToast('🏅 ' + a.name + ' — ' + a.desc);
+}
+
+// ===== 渲染成就展示栏 =====
+function renderAchievementGrid(justUnlocked) {
+  const grid = document.getElementById('achGrid');
+  if (!grid) return;
+  const unlocked = JSON.parse(localStorage.getItem('unlockedAch') || '[]');
+  grid.innerHTML = '';
+  ACHIEVEMENTS.forEach(a => {
+    const isUnlocked = unlocked.includes(a.id);
+    const cell = document.createElement('div');
+    cell.className = 'ach-cell ' + (isUnlocked ? 'unlocked' : 'locked');
+    if (justUnlocked === a.id) cell.classList.add('just-unlocked');
+    cell.innerHTML =
+      '<span class="ach-cell-icon">' + (isUnlocked ? a.icon : '❓') + '</span>' +
+      '<div class="ach-cell-name">' + (isUnlocked ? a.name : '???') + '</div>';
+    // 点击显示详情
+    cell.addEventListener('click', () => {
+      if (!isUnlocked) return;
+      const tip = document.getElementById('achTooltip');
+      document.getElementById('achTipIcon').textContent = a.icon;
+      document.getElementById('achTipName').textContent = a.name;
+      document.getElementById('achTipDesc').textContent = a.desc + ' ✅';
+      tip.classList.add('show');
+      setTimeout(() => tip.classList.remove('show'), 2000);
+    });
+    grid.appendChild(cell);
+  });
+}
+renderAchievementGrid();
+
+// ===== 😤 闲置催促 =====
+let idleTimer = null;
+const idleMsgs = [
+  '你在看什么？快去签到！奶龙已经盯着你30秒了',
+  '奶龙：我在看着你。我在数着。30...29...',
+  '还没签到？奶龙开始怀疑你是不是把图书馆忘了',
+  '别看了，签了吗？没签的话奶龙要开始念经了',
+];
+function resetIdleTimer() {
+  clearTimeout(idleTimer);
+  document.getElementById('idleBubble').classList.remove('show');
+  idleTimer = setTimeout(() => {
+    const bubble = document.getElementById('idleBubble');
+    bubble.textContent = idleMsgs[Math.floor(Math.random() * idleMsgs.length)];
+    bubble.classList.add('show');
+    // 奶龙抖动
+    const sn = document.getElementById('scrollNailong');
+    if (sn) { sn.style.animation = 'none'; void sn.offsetWidth; sn.style.animation = 'scrollFloat 0.3s ease-in-out 3'; }
+  }, 30000);
+}
+['click','touchstart','scroll','keydown'].forEach(e => document.addEventListener(e, resetIdleTimer, {passive:true}));
+resetIdleTimer();
+const NAILONG_QUOTES = [
+  '今天也是适合签到的一天（被迫营业版）',
+  '你为什么还没签到？奶龙已经在墙上抠出一个人形了',
+  '签到使我快乐，不签使我焦虑——奶龙原话',
+  '图书馆那么大，奶龙想去看看，你倒是签到啊',
+  '签到的不是时间，是发际线',
+  '别卷了，先签到吧，卷王也是要签到的',
+  '你签的每次到，都是奶龙的骄傲（强行骄傲）',
+  '今天图书馆的空调温度刚好，适合签到发呆',
+  '摸鱼可以，但别忘了签离，不然奶龙要帮你编借口了',
+  '签个到怎么了？奶龙每天都签，也没见成学霸',
+  '奶龙在图书馆等你，风雨无阻——主要是怕你忘了签到被系统拉黑',
+  '别人在努力，你在签到，这就够了（才怪）',
+  '签到入馆：假装要学习的仪式感',
+  '临时离馆：战略性撤退，去买奶茶算吗',
+  '签离出馆：今天的演技到此结束，明天继续',
+];
+function showRandomQuote() {
+  const el = document.getElementById('quoteText');
+  if (el) el.textContent = NAILONG_QUOTES[Math.floor(Math.random() * NAILONG_QUOTES.length)];
+}
+showRandomQuote();
+
+// ===== 滚动跟随浮动奶龙 =====
+window.addEventListener('scroll', function() {
+  const el = document.getElementById('scrollNailong');
+  if (!el) return;
+  const scrollY = window.scrollY || window.pageYOffset;
+  el.style.transform = 'translateY(0) rotate(' + (-3 + scrollY * 0.01) + 'deg)';
+  el.style.opacity = scrollY > 50 ? '0.7' : '0.3';
+});
+
+// ===== 🍃 季节飘落装饰 =====
+function createSeasonParticles() {
+  const box = document.getElementById('seasonBox');
+  if (!box) return;
+  const month = new Date().getMonth() + 1;
+  let symbols = [];
+  if (month >= 3 && month <= 5)      symbols = ['🌸','💮','🍃','🌷','✿'];   // 春
+  else if (month >= 6 && month <= 8)  symbols = ['☀️','🌊','🍦','🍉','🐚'];   // 夏
+  else if (month >= 9 && month <= 11) symbols = ['🍂','🍁','🌾','🌰','🥮'];   // 秋
+  else                                symbols = ['❄️','⛄','🌨️','✨','🎄'];   // 冬
+
+  for (let i = 0; i < 12; i++) {
+    const el = document.createElement('div');
+    el.className = 'season-particle';
+    el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    el.style.left = Math.random() * 100 + '%';
+    el.style.fontSize = (14 + Math.random() * 12) + 'px';
+    el.style.animationDuration = (6 + Math.random() * 8) + 's';
+    el.style.animationDelay = (Math.random() * 10) + 's';
+    box.appendChild(el);
+  }
+}
+createSeasonParticles();
+
+// ===== 点击弹窗遮罩关闭 =====
+document.getElementById('resultOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeResult();
+});
+</script>
+</body>
+</html>
